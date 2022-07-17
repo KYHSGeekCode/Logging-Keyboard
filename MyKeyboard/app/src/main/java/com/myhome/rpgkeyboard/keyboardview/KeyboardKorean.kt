@@ -10,46 +10,47 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.Animation
 import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import com.myhome.rpgkeyboard.*
-import java.lang.NumberFormatException
+import com.myhome.rpgkeyboard.KeyboardInterationListener
+import com.myhome.rpgkeyboard.R
 
-class KeyboardKorean constructor(var context:Context, var layoutInflater: LayoutInflater, var keyboardInterationListener: KeyboardInterationListener){
+class KeyboardKorean constructor(
+    var context: Context,
+    var layoutInflater: LayoutInflater,
+    var keyboardInterationListener: KeyboardInterationListener
+) {
 
     lateinit var koreanLayout: LinearLayout
-    var isCaps:Boolean = false
-    var buttons:MutableList<Button> = mutableListOf<Button>()
+    var isCaps: Boolean = false
+    var buttons: MutableList<Button> = mutableListOf<Button>()
     lateinit var hangulMaker: HangulMaker
     lateinit var vibrator: Vibrator
-    lateinit var sharedPreferences:SharedPreferences
-    var inputConnection:InputConnection? = null
-        set(inputConnection){
+    lateinit var sharedPreferences: SharedPreferences
+    var inputConnection: InputConnection? = null
+        set(inputConnection) {
             field = inputConnection
-    }
+        }
     var sound = 0
     var vibrate = 0
-    val numpadText = listOf<String>("1","2","3","4","5","6","7","8","9","0")
-    val firstLineText = listOf<String>("ㅂ","ㅈ","ㄷ","ㄱ","ㅅ","ㅛ","ㅕ","ㅑ","ㅐ","ㅔ")
-    val secondLineText = listOf<String>("ㅁ","ㄴ","ㅇ","ㄹ","ㅎ","ㅗ","ㅓ","ㅏ","ㅣ")
-    val thirdLineText = listOf<String>("CAPS","ㅋ","ㅌ","ㅊ","ㅍ","ㅠ","ㅜ","ㅡ","DEL")
-    val fourthLineText = listOf<String>("!#1","한/영",",","space",".","Enter")
-    val firstLongClickText = listOf("!","@","#","$","%","^","&","*","(",")")
-    val secondLongClickText = listOf<String>("~","+","-","×","♥",":",";","'","\"")
-    val thirdLongClickText = listOf("","_","<",">","/",",","?")
+    val numpadText = listOf<String>("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+    val firstLineText = listOf<String>("ㅂ", "ㅈ", "ㄷ", "ㄱ", "ㅅ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ")
+    val secondLineText = listOf<String>("ㅁ", "ㄴ", "ㅇ", "ㄹ", "ㅎ", "ㅗ", "ㅓ", "ㅏ", "ㅣ")
+    val thirdLineText = listOf<String>("CAPS", "ㅋ", "ㅌ", "ㅊ", "ㅍ", "ㅠ", "ㅜ", "ㅡ", "DEL")
+    val fourthLineText = listOf<String>("!#1", "한/영", ",", "space", ".", "Enter")
+    val firstLongClickText = listOf("!", "@", "#", "$", "%", "^", "&", "*", "(", ")")
+    val secondLongClickText = listOf<String>("~", "+", "-", "×", "♥", ":", ";", "'", "\"")
+    val thirdLongClickText = listOf("", "_", "<", ">", "/", ",", "?")
     val myKeysText = ArrayList<List<String>>()
     val myLongClickKeysText = ArrayList<List<String>>()
     val layoutLines = ArrayList<LinearLayout>()
-    var downView:View? = null
-    var capsView:ImageView? = null
+    var downView: View? = null
+    var capsView: ImageView? = null
 
-    fun init(){
+    fun init() {
         koreanLayout = layoutInflater.inflate(R.layout.keyboard_action, null) as LinearLayout
         hangulMaker = HangulMaker(inputConnection!!)
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -77,14 +78,26 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
             R.id.fourth_line
         )
 
-        if(config.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            firstLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (height*0.7).toInt())
-            secondLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (height*0.7).toInt())
-            thirdLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (height*0.7).toInt())
-        }else{
-            firstLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
-            secondLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
-            thirdLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+        if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            firstLine.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (height * 0.7).toInt()
+            )
+            secondLine.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (height * 0.7).toInt()
+            )
+            thirdLine.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (height * 0.7).toInt()
+            )
+        } else {
+            firstLine.layoutParams =
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+            secondLine.layoutParams =
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+            thirdLine.layoutParams =
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
         }
 
         myKeysText.clear()
@@ -109,19 +122,19 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
 
     }
 
-    fun getLayout():LinearLayout{
+    fun getLayout(): LinearLayout {
         hangulMaker = HangulMaker(inputConnection!!)
         setLayoutComponents()
         return koreanLayout
     }
 
 
-    fun modeChange(){
-        if(isCaps){
+    fun modeChange() {
+        if (isCaps) {
             isCaps = false
             capsView?.setImageResource(R.drawable.ic_caps_unlock)
-            for(button in buttons){
-                when(button.text.toString()){
+            for (button in buttons) {
+                when (button.text.toString()) {
                     "ㅃ" -> {
                         button.text = "ㅂ"
                     }
@@ -145,12 +158,11 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
                     }
                 }
             }
-        }
-        else{
+        } else {
             isCaps = true
             capsView?.setImageResource(R.drawable.ic_caps_lock)
-            for(button in buttons){
-                when(button.text.toString()){
+            for (button in buttons) {
+                when (button.text.toString()) {
                     "ㅂ" -> {
                         button.text = "ㅃ"
                     }
@@ -188,49 +200,57 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
         }
     }
 
-    private fun playVibrate(){
-        if(vibrate > 0){
+    private fun playVibrate() {
+        if (vibrate > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createOneShot(70, vibrate))
-            }
-            else{
+            } else {
                 vibrator.vibrate(70)
             }
         }
     }
 
-    private fun getMyClickListener(actionButton:Button):View.OnClickListener{
+    private fun getMyClickListener(actionButton: Button): View.OnClickListener {
 
         val clickListener = (View.OnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 inputConnection?.requestCursorUpdates(InputConnection.CURSOR_UPDATE_IMMEDIATE)
             }
             playVibrate()
-            val cursorcs:CharSequence? =  inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
-            if(cursorcs != null && cursorcs.length >= 2){
+            val cursorcs: CharSequence? =
+                inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
+            if (cursorcs != null && cursorcs.length >= 2) {
 
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
-                inputConnection?.sendKeyEvent(KeyEvent(eventTime, eventTime,
-                    KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                    KeyEvent.FLAG_SOFT_KEYBOARD))
-                inputConnection?.sendKeyEvent(KeyEvent(SystemClock.uptimeMillis(), eventTime,
-                    KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                    KeyEvent.FLAG_SOFT_KEYBOARD))
+                inputConnection?.sendKeyEvent(
+                    KeyEvent(
+                        eventTime, eventTime,
+                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                        KeyEvent.FLAG_SOFT_KEYBOARD
+                    )
+                )
+                inputConnection?.sendKeyEvent(
+                    KeyEvent(
+                        SystemClock.uptimeMillis(), eventTime,
+                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                        KeyEvent.FLAG_SOFT_KEYBOARD
+                    )
+                )
                 hangulMaker.clear()
             }
             when (actionButton.text.toString()) {
 
                 else -> {
                     playClick(actionButton.text.toString().toCharArray().get(0).toInt())
-                    try{
+                    try {
                         val myText = Integer.parseInt(actionButton.text.toString())
                         hangulMaker.directlyCommit()
                         inputConnection?.commitText(actionButton.text.toString(), 1)
-                    }catch (e:NumberFormatException){
+                    } catch (e: NumberFormatException) {
                         hangulMaker.commit(actionButton.text.toString().toCharArray().get(0))
                     }
-                    if(isCaps){
+                    if (isCaps) {
                         modeChange()
                     }
                 }
@@ -240,17 +260,17 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
         return clickListener
     }
 
-    fun getOnTouchListener(clickListener: View.OnClickListener):View.OnTouchListener{
+    fun getOnTouchListener(clickListener: View.OnClickListener): View.OnTouchListener {
         val handler = Handler()
         val initailInterval = 500
         val normalInterval = 100
-        val handlerRunnable = object: Runnable{
+        val handlerRunnable = object : Runnable {
             override fun run() {
                 handler.postDelayed(this, normalInterval.toLong())
                 clickListener.onClick(downView)
             }
         }
-        val onTouchListener = object:View.OnTouchListener {
+        val onTouchListener = object : View.OnTouchListener {
             override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
                 when (motionEvent?.getAction()) {
                     MotionEvent.ACTION_DOWN -> {
@@ -278,16 +298,16 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
         return onTouchListener
     }
 
-    private fun setLayoutComponents(){
-        for(line in layoutLines.indices){
+    private fun setLayoutComponents() {
+        for (line in layoutLines.indices) {
             val children = layoutLines[line].children.toList()
             val myText = myKeysText[line]
             var longClickIndex = 0
-            for(item in children.indices){
+            for (item in children.indices) {
                 val actionButton = children[item].findViewById<Button>(R.id.key_button)
                 val spacialKey = children[item].findViewById<ImageView>(R.id.spacial_key)
-                var myOnClickListener:View.OnClickListener? = null
-                when(myText[item]){
+                var myOnClickListener: View.OnClickListener? = null
+                when (myText[item]) {
                     "space" -> {
                         spacialKey.setImageResource(R.drawable.ic_space_bar)
                         spacialKey.visibility = View.VISIBLE
@@ -326,7 +346,7 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
                     "한/영" -> {
                         actionButton.text = myText[item]
                         buttons.add(actionButton)
-                        myOnClickListener = object :View.OnClickListener{
+                        myOnClickListener = object : View.OnClickListener {
                             override fun onClick(p0: View?) {
                                 keyboardInterationListener.modechange(0)
                             }
@@ -336,7 +356,7 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
                     "!#1" -> {
                         actionButton.text = myText[item]
                         buttons.add(actionButton)
-                        myOnClickListener = object :View.OnClickListener{
+                        myOnClickListener = object : View.OnClickListener {
                             override fun onClick(p0: View?) {
                                 keyboardInterationListener.modechange(2)
                             }
@@ -354,54 +374,71 @@ class KeyboardKorean constructor(var context:Context, var layoutInflater: Layout
             }
         }
     }
-    fun getSpaceAction():View.OnClickListener{
-        return View.OnClickListener{
+
+    fun getSpaceAction(): View.OnClickListener {
+        return View.OnClickListener {
             playClick('ㅂ'.toInt())
             playVibrate()
             hangulMaker.commitSpace()
         }
     }
 
-    fun getDeleteAction():View.OnClickListener{
-        return View.OnClickListener{
+    fun getDeleteAction(): View.OnClickListener {
+        return View.OnClickListener {
             playVibrate()
-            val cursorcs:CharSequence? =  inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
-            if(cursorcs != null && cursorcs.length >= 2){
+            val cursorcs: CharSequence? =
+                inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
+            if (cursorcs != null && cursorcs.length >= 2) {
 
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
-                inputConnection?.sendKeyEvent(KeyEvent(eventTime, eventTime,
-                    KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                    KeyEvent.FLAG_SOFT_KEYBOARD))
-                inputConnection?.sendKeyEvent(KeyEvent(SystemClock.uptimeMillis(), eventTime,
-                    KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                    KeyEvent.FLAG_SOFT_KEYBOARD))
+                inputConnection?.sendKeyEvent(
+                    KeyEvent(
+                        eventTime, eventTime,
+                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                        KeyEvent.FLAG_SOFT_KEYBOARD
+                    )
+                )
+                inputConnection?.sendKeyEvent(
+                    KeyEvent(
+                        SystemClock.uptimeMillis(), eventTime,
+                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                        KeyEvent.FLAG_SOFT_KEYBOARD
+                    )
+                )
                 hangulMaker.clear()
-            }
-            else{
+            } else {
                 hangulMaker.delete()
             }
         }
     }
 
-    fun getCapsAction():View.OnClickListener{
-        return View.OnClickListener{
+    fun getCapsAction(): View.OnClickListener {
+        return View.OnClickListener {
             playVibrate()
             modeChange()
         }
     }
 
-    fun getEnterAction():View.OnClickListener{
-        return View.OnClickListener{
+    fun getEnterAction(): View.OnClickListener {
+        return View.OnClickListener {
             playVibrate()
             hangulMaker.directlyCommit()
             val eventTime = SystemClock.uptimeMillis()
-            inputConnection?.sendKeyEvent(KeyEvent(eventTime, eventTime,
-                KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
-                KeyEvent.FLAG_SOFT_KEYBOARD))
-            inputConnection?.sendKeyEvent(KeyEvent(SystemClock.uptimeMillis(), eventTime,
-                KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
-                KeyEvent.FLAG_SOFT_KEYBOARD))
+            inputConnection?.sendKeyEvent(
+                KeyEvent(
+                    eventTime, eventTime,
+                    KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
+                    KeyEvent.FLAG_SOFT_KEYBOARD
+                )
+            )
+            inputConnection?.sendKeyEvent(
+                KeyEvent(
+                    SystemClock.uptimeMillis(), eventTime,
+                    KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
+                    KeyEvent.FLAG_SOFT_KEYBOARD
+                )
+            )
         }
     }
 

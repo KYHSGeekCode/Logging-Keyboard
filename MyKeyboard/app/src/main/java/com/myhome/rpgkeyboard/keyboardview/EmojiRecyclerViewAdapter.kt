@@ -9,7 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.myhome.rpgkeyboard.R
 
-class EmojiRecyclerViewAdapter(val context:Context, val emojiList:ArrayList<String>, val inputConnection: InputConnection) :RecyclerView.Adapter<EmojiRecyclerViewAdapter.Holder>(){
+class EmojiRecyclerViewAdapter(
+    val context: Context,
+    val emojiList: ArrayList<String>,
+    val inputConnection: InputConnection
+) : RecyclerView.Adapter<EmojiRecyclerViewAdapter.Holder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = LayoutInflater.from(context).inflate(R.layout.emoji_item, parent, false)

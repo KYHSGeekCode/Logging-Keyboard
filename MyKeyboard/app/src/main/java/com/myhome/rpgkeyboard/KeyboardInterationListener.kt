@@ -1,5 +1,5 @@
 package com.myhome.rpgkeyboard
 
-interface KeyboardInterationListener{
-    fun modechange(mode:Int)
+interface KeyboardInterationListener {
+    fun modechange(mode: Int)
 }

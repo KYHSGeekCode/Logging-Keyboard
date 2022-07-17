@@ -5,45 +5,47 @@ import android.content.res.Configuration
 import android.inputmethodservice.Keyboard
 import android.media.AudioManager
 import android.os.*
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.Animation
 import android.view.inputmethod.InputConnection
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.view.children
-import com.myhome.rpgkeyboard.*
+import com.myhome.rpgkeyboard.KeyboardInterationListener
+import com.myhome.rpgkeyboard.R
 
-class KeyboardSimbols constructor(var context:Context, var layoutInflater: LayoutInflater, var keyboardInterationListener: KeyboardInterationListener) {
+class KeyboardSimbols constructor(
+    var context: Context,
+    var layoutInflater: LayoutInflater,
+    var keyboardInterationListener: KeyboardInterationListener
+) {
     lateinit var simbolsLayout: LinearLayout
-    var inputConnection:InputConnection? = null
-        set(inputConnection){
+    var inputConnection: InputConnection? = null
+        set(inputConnection) {
             field = inputConnection
         }
-    var isCaps:Boolean = false
-    var buttons:MutableList<Button> = mutableListOf<Button>()
+    var isCaps: Boolean = false
+    var buttons: MutableList<Button> = mutableListOf<Button>()
     lateinit var vibrator: Vibrator
 
 
-
-    val numpadText = listOf<String>("1","2","3","4","5","6","7","8","9","0")
-    val firstLineText = listOf<String>("+","×","÷","=","/","￦","<",">","♡","☆")
-    val secondLineText = listOf<String>("!","@","#","~","%","^","&","*","(",")")
-    val thirdLineText = listOf<String>("\uD83D\uDE00","-","'","\"",":",";",",","?","DEL")
-    val fourthLineText = listOf<String>("가","한/영",",","space",".","Enter")
+    val numpadText = listOf<String>("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
+    val firstLineText = listOf<String>("+", "×", "÷", "=", "/", "￦", "<", ">", "♡", "☆")
+    val secondLineText = listOf<String>("!", "@", "#", "~", "%", "^", "&", "*", "(", ")")
+    val thirdLineText = listOf<String>("\uD83D\uDE00", "-", "'", "\"", ":", ";", ",", "?", "DEL")
+    val fourthLineText = listOf<String>("가", "한/영", ",", "space", ".", "Enter")
     val myKeysText = ArrayList<List<String>>()
     val layoutLines = ArrayList<LinearLayout>()
-    var downView:View? = null
-    var animationMode:Int = 0
+    var downView: View? = null
+    var animationMode: Int = 0
     var vibrate = 0
     var sound = 0
-    var capsView:ImageView? = null
+    var capsView: ImageView? = null
 
-    fun init(){
+    fun init() {
         simbolsLayout = layoutInflater.inflate(R.layout.keyboard_simbols, null) as LinearLayout
         inputConnection = inputConnection
         keyboardInterationListener = keyboardInterationListener
@@ -73,14 +75,26 @@ class KeyboardSimbols constructor(var context:Context, var layoutInflater: Layou
             R.id.fourth_line
         )
 
-        if(config.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            firstLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (height*0.7).toInt())
-            secondLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (height*0.7).toInt())
-            thirdLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (height*0.7).toInt())
-        }else{
-            firstLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
-            secondLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
-            thirdLine.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+        if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            firstLine.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (height * 0.7).toInt()
+            )
+            secondLine.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (height * 0.7).toInt()
+            )
+            thirdLine.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (height * 0.7).toInt()
+            )
+        } else {
+            firstLine.layoutParams =
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+            secondLine.layoutParams =
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
+            thirdLine.layoutParams =
+                LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height)
         }
 
         myKeysText.clear()
@@ -100,20 +114,19 @@ class KeyboardSimbols constructor(var context:Context, var layoutInflater: Layou
         setLayoutComponents()
     }
 
-    fun getLayout():LinearLayout{
+    fun getLayout(): LinearLayout {
         return simbolsLayout
     }
 
-    fun modeChange(){
-        if(isCaps){
+    fun modeChange() {
+        if (isCaps) {
             isCaps = false
-            for(button in buttons){
+            for (button in buttons) {
                 button.setText(button.text.toString().toLowerCase())
             }
-        }
-        else{
+        } else {
             isCaps = true
-            for(button in buttons){
+            for (button in buttons) {
                 button.setText(button.text.toString().toUpperCase())
             }
         }
@@ -130,35 +143,43 @@ class KeyboardSimbols constructor(var context:Context, var layoutInflater: Layou
     }
 
 
-    private fun playVibrate(){
-        if(vibrate > 0){
+    private fun playVibrate() {
+        if (vibrate > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createOneShot(70, vibrate))
-            }
-            else{
+            } else {
                 vibrator.vibrate(70)
             }
         }
     }
 
-    private fun getMyClickListener(actionButton:Button):View.OnClickListener{
+    private fun getMyClickListener(actionButton: Button): View.OnClickListener {
 
         val clickListener = (View.OnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 inputConnection?.requestCursorUpdates(InputConnection.CURSOR_UPDATE_IMMEDIATE)
             }
             playVibrate()
-            val cursorcs:CharSequence? =  inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
-            if(cursorcs != null && cursorcs.length >= 2){
+            val cursorcs: CharSequence? =
+                inputConnection?.getSelectedText(InputConnection.GET_TEXT_WITH_STYLES)
+            if (cursorcs != null && cursorcs.length >= 2) {
 
                 val eventTime = SystemClock.uptimeMillis()
                 inputConnection?.finishComposingText()
-                inputConnection?.sendKeyEvent(KeyEvent(eventTime, eventTime,
-                    KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                    KeyEvent.FLAG_SOFT_KEYBOARD))
-                inputConnection?.sendKeyEvent(KeyEvent(SystemClock.uptimeMillis(), eventTime,
-                    KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
-                    KeyEvent.FLAG_SOFT_KEYBOARD))
+                inputConnection?.sendKeyEvent(
+                    KeyEvent(
+                        eventTime, eventTime,
+                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                        KeyEvent.FLAG_SOFT_KEYBOARD
+                    )
+                )
+                inputConnection?.sendKeyEvent(
+                    KeyEvent(
+                        SystemClock.uptimeMillis(), eventTime,
+                        KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0,
+                        KeyEvent.FLAG_SOFT_KEYBOARD
+                    )
+                )
             }
 
             when (actionButton.text.toString()) {
@@ -186,17 +207,17 @@ class KeyboardSimbols constructor(var context:Context, var layoutInflater: Layou
         return clickListener
     }
 
-    fun getOnTouchListener(clickListener: View.OnClickListener):View.OnTouchListener{
+    fun getOnTouchListener(clickListener: View.OnClickListener): View.OnTouchListener {
         val handler = Handler()
         val initailInterval = 500
         val normalInterval = 100
-        val handlerRunnable = object: Runnable{
+        val handlerRunnable = object : Runnable {
             override fun run() {
                 handler.postDelayed(this, normalInterval.toLong())
                 clickListener.onClick(downView)
             }
         }
-        val onTouchListener = object:View.OnTouchListener {
+        val onTouchListener = object : View.OnTouchListener {
             override fun onTouch(view: View?, motionEvent: MotionEvent?): Boolean {
                 when (motionEvent?.getAction()) {
                     MotionEvent.ACTION_DOWN -> {
@@ -224,16 +245,16 @@ class KeyboardSimbols constructor(var context:Context, var layoutInflater: Layou
         return onTouchListener
     }
 
-    private fun setLayoutComponents(){
+    private fun setLayoutComponents() {
 //            inputConnection.beginBatchEdit()
-        for(line in layoutLines.indices){
+        for (line in layoutLines.indices) {
             val children = layoutLines[line].children.toList()
             val myText = myKeysText[line]
-            for(item in children.indices){
+            for (item in children.indices) {
                 val actionButton = children[item].findViewById<Button>(R.id.key_button)
                 val spacialKey = children[item].findViewById<ImageView>(R.id.spacial_key)
-                var myOnClickListener:View.OnClickListener? = null
-                when(myText[item]){
+                var myOnClickListener: View.OnClickListener? = null
+                when (myText[item]) {
                     "space" -> {
                         spacialKey.setImageResource(R.drawable.ic_space_bar)
                         spacialKey.visibility = View.VISIBLE
@@ -281,42 +302,51 @@ class KeyboardSimbols constructor(var context:Context, var layoutInflater: Layou
             }
         }
     }
-    fun getSpaceAction():View.OnClickListener{
-        return View.OnClickListener{
+
+    fun getSpaceAction(): View.OnClickListener {
+        return View.OnClickListener {
             playClick('ㅂ'.toInt())
             playVibrate()
-            inputConnection?.commitText(" ",1)
+            inputConnection?.commitText(" ", 1)
         }
     }
 
-    fun getDeleteAction():View.OnClickListener{
-        return View.OnClickListener{
+    fun getDeleteAction(): View.OnClickListener {
+        return View.OnClickListener {
             playVibrate()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 inputConnection?.deleteSurroundingTextInCodePoints(1, 0)
-            }else{
-                inputConnection?.deleteSurroundingText(1,0)
+            } else {
+                inputConnection?.deleteSurroundingText(1, 0)
             }
         }
     }
 
-    fun getCapsAction():View.OnClickListener{
-        return View.OnClickListener{
+    fun getCapsAction(): View.OnClickListener {
+        return View.OnClickListener {
             playVibrate()
             modeChange()
         }
     }
 
-    fun getEnterAction():View.OnClickListener{
-        return View.OnClickListener{
+    fun getEnterAction(): View.OnClickListener {
+        return View.OnClickListener {
             playVibrate()
             val eventTime = SystemClock.uptimeMillis()
-            inputConnection?.sendKeyEvent(KeyEvent(eventTime, eventTime,
-                KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
-                KeyEvent.FLAG_SOFT_KEYBOARD))
-            inputConnection?.sendKeyEvent(KeyEvent(SystemClock.uptimeMillis(), eventTime,
-                KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
-                KeyEvent.FLAG_SOFT_KEYBOARD))
+            inputConnection?.sendKeyEvent(
+                KeyEvent(
+                    eventTime, eventTime,
+                    KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
+                    KeyEvent.FLAG_SOFT_KEYBOARD
+                )
+            )
+            inputConnection?.sendKeyEvent(
+                KeyEvent(
+                    SystemClock.uptimeMillis(), eventTime,
+                    KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER, 0, 0, 0, 0,
+                    KeyEvent.FLAG_SOFT_KEYBOARD
+                )
+            )
         }
     }
 
