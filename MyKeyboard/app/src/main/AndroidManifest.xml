@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.myhome.rpgkeyboard">
+        package="com.myhome.rpgkeyboard">
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
             android:allowBackup="true"
@@ -11,14 +11,6 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".setting.custom.SettingCustomActivity">
-        </activity>
-        <activity android:name=".setting.SettingDetailActivity">
-        </activity>
-
-        <meta-data
-                android:name="com.google.android.gms.ads.APPLICATION_ID"
-                android:value="ca-app-pub-3136625326865731~7052493358"/>
 
         <service
                 android:name=".KeyBoardService"
@@ -28,20 +20,21 @@
                 android:permission="android.permission.BIND_INPUT_METHOD">
             <meta-data
                     android:name="android.view.im"
-                    android:resource="@xml/xml"/>
+                    android:resource="@xml/xml" />
 
             <intent-filter>
-                <action android:name="android.view.InputMethod"/>
+                <action android:name="android.view.InputMethod" />
             </intent-filter>
         </service>
 
         <activity
                 android:name=".MainActivity"
-                android:windowSoftInputMode="stateVisible|adjustResize">
+                android:windowSoftInputMode="stateVisible|adjustResize"
+                android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
