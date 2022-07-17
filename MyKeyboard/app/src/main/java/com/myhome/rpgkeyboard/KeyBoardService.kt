@@ -16,21 +16,21 @@ class KeyBoardService : InputMethodService() {
     lateinit var keyboardSimbols: KeyboardSimbols
     var isQwerty = 0 // shared preference에 데이터를 저장하고 불러오는 기능 필요
 
-
     val keyboardInterationListener = object : KeyboardInterationListener {
         //inputconnection이 null일경우 재요청하는 부분 필요함
         override fun modechange(mode: Int) {
-            currentInputConnection.finishComposingText()
+            val chattyInputConnection = ChattyInputConnection(currentInputConnection)
+            chattyInputConnection.finishComposingText()
             when (mode) {
                 0 -> {
                     keyboardFrame.removeAllViews()
-                    keyboardEnglish.inputConnection = currentInputConnection
+                    keyboardEnglish.inputConnection = chattyInputConnection
                     keyboardFrame.addView(keyboardEnglish.getLayout())
                 }
                 1 -> {
                     if (isQwerty == 0) {
                         keyboardFrame.removeAllViews()
-                        keyboardKorean.inputConnection = currentInputConnection
+                        keyboardKorean.inputConnection = chattyInputConnection
                         keyboardFrame.addView(keyboardKorean.getLayout())
                     } else {
                         keyboardFrame.removeAllViews()
@@ -38,7 +38,7 @@ class KeyBoardService : InputMethodService() {
                             KeyboardChunjiin.newInstance(
                                 applicationContext,
                                 layoutInflater,
-                                currentInputConnection,
+                                chattyInputConnection,
                                 this
                             )
                         )
@@ -46,7 +46,7 @@ class KeyBoardService : InputMethodService() {
                 }
                 2 -> {
                     keyboardFrame.removeAllViews()
-                    keyboardSimbols.inputConnection = currentInputConnection
+                    keyboardSimbols.inputConnection = chattyInputConnection
                     keyboardFrame.addView(keyboardSimbols.getLayout())
                 }
                 3 -> {
@@ -55,7 +55,7 @@ class KeyBoardService : InputMethodService() {
                         KeyboardEmoji.newInstance(
                             applicationContext,
                             layoutInflater,
-                            currentInputConnection,
+                            chattyInputConnection,
                             this
                         )
                     )
@@ -71,32 +71,34 @@ class KeyBoardService : InputMethodService() {
     }
 
     override fun onCreateInputView(): View {
+        val chattyInputConnection = ChattyInputConnection(currentInputConnection)
         keyboardKorean =
             KeyboardKorean(applicationContext, layoutInflater, keyboardInterationListener)
         keyboardEnglish =
             KeyboardEnglish(applicationContext, layoutInflater, keyboardInterationListener)
         keyboardSimbols =
             KeyboardSimbols(applicationContext, layoutInflater, keyboardInterationListener)
-        keyboardKorean.inputConnection = currentInputConnection
+        keyboardKorean.inputConnection = chattyInputConnection
         keyboardKorean.init()
-        keyboardEnglish.inputConnection = currentInputConnection
+        keyboardEnglish.inputConnection = chattyInputConnection
         keyboardEnglish.init()
-        keyboardSimbols.inputConnection = currentInputConnection
+        keyboardSimbols.inputConnection = chattyInputConnection
         keyboardSimbols.init()
 
         return keyboardView
     }
 
     override fun updateInputViewShown() {
+        val chattyInputConnection = ChattyInputConnection(currentInputConnection)
         super.updateInputViewShown()
-        currentInputConnection.finishComposingText()
+        chattyInputConnection.finishComposingText()
         if (currentInputEditorInfo.inputType == EditorInfo.TYPE_CLASS_NUMBER) {
             keyboardFrame.removeAllViews()
             keyboardFrame.addView(
                 KeyboardNumpad.newInstance(
                     applicationContext,
                     layoutInflater,
-                    currentInputConnection,
+                    chattyInputConnection,
                     keyboardInterationListener
                 )
             )
